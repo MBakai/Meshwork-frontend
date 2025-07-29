@@ -1,0 +1,59 @@
+<!-- Overlay para cerrar al hacer click fuera -->
+<div class="panel-overlay" (click)="cerrar.emit()"></div>
+
+<div class="panel-notificaciones" (click)="$event.stopPropagation()">
+  <div class="panel-header">
+    <h4>
+      <i class="fa-regular fa-bell" style="margin-right: 8px;"></i>
+      Notificaciones
+    </h4>
+    <button (click)="cerrar.emit()" title="Cerrar">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <!-- Estado de carga -->
+  <div *ngIf="cargando" class="noti-loading">
+    <div class="loading-spinner"></div>
+    Cargando notificaciones...
+  </div>
+
+  <!-- Lista de notificaciones -->
+  <ul *ngIf="!cargando && notificaciones.length > 0" class="noti-lista">
+    <li *ngFor="let noti of notificaciones" 
+        [class]="'noti-item ' + (noti.tipo || 'general') + (noti.leida ? '' : ' no-leida')"
+        (click)="marcarComoLeida(noti)">
+      
+      <div class="noti-contenido">
+        <div class="noti-titulo" *ngIf="noti.titulo">{{ noti.titulo }}</div>
+        <div class="noti-mensaje">{{ noti.mensaje }}</div>
+        <div class="noti-tiempo" *ngIf="noti.createAt">{{ formatearFecha(noti.createAt) }}</div>
+        
+        <!-- Botones de acción para solicitudes -->
+        <div class="noti-acciones" *ngIf="noti.tipo === 'SOLICITUD_ENVIADA' && !noti.procesada">
+          <button class="btn-noti btn-aceptar" (click)="aceptarSolicitud(noti, $event)">
+            <i class="fa-solid fa-check"></i> Aceptar
+          </button>
+          <button class="btn-noti btn-rechazar" (click)="rechazarSolicitud(noti, $event)">
+            <i class="fa-solid fa-times"></i> Rechazar
+          </button>
+        </div>
+      </div>
+    </li>
+  </ul>
+
+  <!-- Estado vacío -->
+  <div *ngIf="!cargando && notificaciones.length === 0" class="noti-vacia">
+    <i class="fa-regular fa-bell-slash"></i>
+    <p>No tienes notificaciones</p>
+  </div>
+
+  <!-- Botón para marcar todas como leídas -->
+  <button 
+    *ngIf="!cargando && notificaciones.length > 0 && tieneNoLeidas()" 
+    (click)="marcarTodasComoLeidas()"
+    class="btn-marcar-leidas">
+    <i class="fa-solid fa-check-double"></i>
+    Marcar todas como leídas
+  </button>
+</div>

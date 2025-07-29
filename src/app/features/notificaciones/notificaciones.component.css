@@ -1,0 +1,384 @@
+/* Panel de Notificaciones */
+.panel-notificaciones {
+    position: fixed;
+    top: 80px; /* Ajustado para estar debajo del navbar */
+    right: 20px;
+    width: 350px;
+    max-width: 90vw;
+    max-height: 500px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    animation: slideInFromRight 0.3s ease-out;
+}
+
+/* Header del Panel */
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.panel-header h4 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.panel-header button {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(5px);
+}
+
+.panel-header button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.panel-header button:active {
+    transform: scale(0.95);
+}
+
+.panel-notificaciones {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.panel-notificaciones.cerrando {
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+/* Lista de Notificaciones */
+.noti-lista {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 350px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+.noti-lista::-webkit-scrollbar {
+    width: 6px;
+}
+
+.noti-lista::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.noti-lista::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+.noti-lista::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Items de Notificación */
+.noti-lista li {
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    font-size: 14px;
+    color: #333;
+    line-height: 1.4;
+    position: relative;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.noti-lista li:hover {
+    background: rgba(102, 126, 234, 0.05);
+    transform: translateX(2px);
+}
+
+.noti-lista li:last-child {
+    border-bottom: none;
+}
+
+/* Icono de notificación */
+.noti-lista li::before {
+    content: '🔔';
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* Diferentes tipos de notificaciones */
+.noti-lista li.solicitud::before {
+    content: '👤';
+}
+
+.noti-lista li.tarea::before {
+    content: '📋';
+}
+
+.noti-lista li.mensaje::before {
+    content: '💬';
+}
+
+.noti-lista li.sistema::before {
+    content: '⚙️';
+}
+
+/* Estado de notificación no leída */
+.noti-lista li.no-leida {
+    background: rgba(102, 126, 234, 0.03);
+    border-left: 4px solid #667eea;
+}
+
+.noti-lista li.no-leida::after {
+    content: '';
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    background: #667eea;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+/* Botón de marcar como leídas */
+.panel-notificaciones > button {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 0 0 15px 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.panel-notificaciones > button:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    transform: translateY(-1px);
+}
+
+.panel-notificaciones > button:active {
+    transform: translateY(0);
+}
+
+/* Estado vacío */
+.noti-vacia {
+    padding: 40px 20px;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+}
+
+.noti-vacia i {
+    font-size: 48px;
+    color: #ccc;
+    margin-bottom: 15px;
+    display: block;
+}
+
+/* Timestamp de notificación */
+.noti-tiempo {
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+/* Contenido de la notificación */
+.noti-contenido {
+    flex: 1;
+}
+
+.noti-titulo {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.noti-mensaje {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.3;
+}
+
+/* Animaciones */
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .panel-notificaciones {
+        top: 70px;
+        right: 10px;
+        width: 320px;
+        max-height: 400px;
+    }
+    
+    .panel-header {
+        padding: 15px;
+    }
+    
+    .panel-header h4 {
+        font-size: 16px;
+    }
+    
+    .noti-lista {
+        max-height: 280px;
+    }
+    
+    .noti-lista li {
+        padding: 12px 15px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .panel-notificaciones {
+        top: 60px;
+        right: 5px;
+        left: 5px;
+        width: auto;
+        max-height: 350px;
+    }
+    
+    .panel-header {
+        padding: 12px 15px;
+    }
+    
+    .panel-header h4 {
+        font-size: 15px;
+    }
+    
+    .noti-lista {
+        max-height: 220px;
+    }
+    
+    .noti-lista li {
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+    
+    .panel-notificaciones > button {
+        padding: 12px;
+        font-size: 13px;
+    }
+}
+
+/* Overlay para cerrar al hacer click fuera */
+.panel-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.1);
+    z-index: 9998;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Efecto de carga */
+.noti-loading {
+    padding: 30px;
+    text-align: center;
+    color: #667eea;
+    font-size: 14px;
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Botones de acción en notificaciones */
+.noti-acciones {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.btn-noti {
+    padding: 4px 8px;
+    font-size: 11px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.btn-aceptar {
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+    border: 1px solid rgba(40, 167, 69, 0.2);
+}
+
+.btn-aceptar:hover {
+    background: rgba(40, 167, 69, 0.2);
+    transform: scale(1.05);
+}
+
+.btn-rechazar {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border: 1px solid rgba(220, 53, 69, 0.2);
+}
+
+.btn-rechazar:hover {
+    background: rgba(220, 53, 69, 0.2);
+    transform: scale(1.05);
+}

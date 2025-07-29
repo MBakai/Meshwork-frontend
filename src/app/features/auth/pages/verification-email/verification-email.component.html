@@ -1,0 +1,53 @@
+
+<div class="verify-container">
+  <div class="verify-card">
+    
+    <!-- Estado de carga -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner-large"></div>
+      <h3>Verificando tu cuenta...</h3>
+      <p>Por favor espera mientras procesamos tu verificación.</p>
+    </div>
+
+    <!-- Estado de éxito -->
+    <div *ngIf="success && !loading" class="success-state">
+      <div class="success-icon-large">✓</div>
+      <h2>¡Cuenta Verificada!</h2>
+      <p>Tu cuenta ha sido verificada exitosamente. Ya puedes iniciar sesión en nuestra plataforma.</p>
+      
+      <div class="countdown-section">
+        <p class="countdown-text">
+          Serás redirigido al login en <strong>{{ countdown }}</strong> segundo{{ countdown !== 1 ? 's' : '' }}...
+        </p>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="((3 - countdown) / 3) * 100"></div>
+        </div>
+      </div>
+
+      
+    </div>
+
+    <!-- Estado de error -->
+    <div *ngIf="error && !loading" class="error-state">
+      <div class="error-icon">⚠</div>
+      <h2>Error de Verificación</h2>
+      <p class="error-message">{{ error }}</p>
+      
+      <div class="error-help">
+        <h4>¿Qué puedes hacer?</h4>
+        <ul>
+          <li>Verificar que el enlace esté completo y no esté truncado</li>
+          <li>El enlace puede haber expirado (válido por 24 horas)</li>
+          <li>Si el enlace expiró, necesitarás registrarte nuevamente</li>
+        </ul>
+      </div>
+
+      <div class="error-actions">
+        <button (click)="goToLogin()" class="btn btn-secondary">
+          Registrarse Nuevamente
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

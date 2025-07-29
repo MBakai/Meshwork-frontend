@@ -1,0 +1,25 @@
+<header class="cabecera">
+    <h1>Meshwork</h1>
+    <nav class="nav-links">
+      <span class="cta-button" (click)="abrirLogin()">Iniciar Sesión</span>
+    </nav>
+  </header>
+
+  
+  <!-- Contenido principal -->
+  <main class="content">
+    <section>
+      <h2>Bienvenido</h2>
+      <p><strong>¿Quieres planear la ruta de poyecto?</strong>
+        <br> 
+        Organiza tus tareas, colabora con tu equipo y mejora tu productividad.</p>
+      </section>
+      <app-registro class="form-registro"></app-registro>
+    </main>
+    
+    <!-- Pie de página -->
+    <footer class="footer">
+      <p>&copy; 2025 Aslowe. Todos los derechos reservados.</p>
+    </footer>
+
+    <app-login *ngIf="mostrarLogin" (cerrar)="mostrarLogin = false" class="modal-overlay"></app-login>

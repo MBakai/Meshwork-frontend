@@ -1,0 +1,110 @@
+
+@if (!cargandoTareas && tasks.length === 0) {
+  <app-first-task></app-first-task>
+}@else{
+  <section class="content">
+  
+    <button
+      (click)="prevTask()"
+      class="nav left"
+      [class.invisible]="numeroTareas <= 1"
+      [disabled]="numeroTareas <= 1">
+      <i class="fa-solid fa-chevron-left"></i>
+    </button>
+      
+      <div class="carousel">
+          
+          <article  class="card-task" *ngFor="let task of tasks; let i = index"
+            [class.active]="i === currentIndex"
+            [class.behind]="i !== currentIndex">
+      
+              <div class="content-btn">
+
+                @if(task.type === 'SIMPLE'){
+                  <button (click)="editarTarea(currentTask!.id)">editar <i class="fa-solid fa-pen-to-square"></i></button>
+                }
+
+                  <button (click)="deleteTask(task.id)">Eliminar <i class="fa-solid fa-trash"></i></button>    
+              </div>
+      
+            <header class="cabecera">
+              <h2>{{ task.titulo }}</h2>
+
+              <div class="estado-container">
+                <p><strong>Estado:</strong> {{ task.estados?.nombre }}</p>
+                  <div class="notification-light" 
+                      [ngClass]="getStatusLightClass(task.estados!.nombre)">
+                  </div>
+              </div>
+            </header>
+      
+            <div class="task-body">
+              <p><strong>Descripción:</strong> {{ task.descripcion }}</p>
+      
+              <section class="subtasks" *ngIf="task.subtasks.length > 0">
+          
+                  <h3>Subtareas</h3>
+                <ul *ngIf="task.subtasks.length <= 2; else manySubtasks">
+                  <li *ngFor="let subtask of task.subtasks">
+                    {{ subtask.titulo }}
+                  </li>
+                </ul>
+
+                <ng-template #manySubtasks>
+                  <p>Tienes {{ task.subtasks.length }} subtareas</p>
+                </ng-template>
+
+                <button (click)="viewTaskDetalis(task.id)">ver mas ... <i class="fa-solid fa-eye"></i></button>
+              </section>
+
+              <div
+                  *ngIf="task.subtasks.length === 0 && task.type === 'SIMPLE' && getSiguienteEstado(task.estados!.id) as siguiente"
+                  class="container-date"
+                >
+                  <p><strong>Tarea de tipo simple</strong></p>
+
+                  <h3>Fecha estimada para terminar</h3>
+                  <p><strong>fecha inicio: </strong>{{ task.startDate | date:'dd/MM/yyyy' }}</p>
+                  <p><strong>fecha final: </strong>{{ task.endDate | date:'dd/MM/yyyy' }}</p>
+                  <p *ngIf="task.endDate">
+                    {{ getDiasParaTarea(task) }}
+                  </p>
+
+                  <button (click)="cambiarEstado(task.id, siguiente)">
+                    Cambiar a "{{ siguiente.nombre }}"
+                  </button>
+                </div>
+            </div>
+      
+            <footer>
+
+              <p><strong>Fecha de creación:</strong> {{ task.createdAt | date: 'short' }}</p>
+              <p *ngIf="task.estados?.id === 4"><strong>fecha de finalización</strong>{{task.completedAt | date: 'short' }}</p>
+            </footer>
+          </article>
+  
+      </div>
+
+      @if (numeroTareas > 1) {
+        <button (click)="nextTask()" class="nav right"
+          [class.invisible]="numeroTareas <= 1"
+          [disabled]="numeroTareas <= 1"> 
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      }
+
+  </section>
+}
+
+<app-task 
+  *ngIf="viewUpdateTask" 
+  [taskId]="idTareaParaEditar"
+  (cerrar)="viewUpdateTask = false"
+  (tareaCompuestaCreada)="editsubTask($event)">
+</app-task>
+
+<app-subtask
+    *ngIf="viewSubTaskForm && idSubTaskPadreEditar"
+    [taskId]="idSubTaskPadreEditar"
+    (cerrar)="viewSubTaskForm = false">
+</app-subtask>

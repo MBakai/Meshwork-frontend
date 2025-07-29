@@ -1,0 +1,41 @@
+<div class="modal-overlay" *ngIf="isVisible" (click)="closeModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>¡Revisa tu correo electrónico!</h2>
+          <button class="close-btn" (click)="closeModal()">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="icon-container">
+            <svg class="email-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </div>
+          
+          <p class="main-message">
+            Te hemos enviado un correo de verificación a <strong>{{ userEmail }}</strong>
+          </p>
+          
+          <p class="sub-message">
+            Por favor, revisa tu bandeja de entrada y haz clic en el enlace de verificación 
+            para completar tu registro.
+          </p>
+          
+          <div class="help-text">
+            <p>¿No encuentras el correo?</p>
+            <ul>
+              <li>Revisa tu carpeta de spam o correo no deseado</li>
+              <li>Verifica que la dirección de correo sea correcta</li>
+              <li>El correo puede tardar unos minutos en llegar</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button class="btn-primary" (click)="closeModal()">
+            Entendido
+          </button>
+        </div>
+      </div>
+    </div>

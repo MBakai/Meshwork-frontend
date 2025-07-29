@@ -1,0 +1,274 @@
+<section class="proyecto-container" >
+    <header class="proyecto-header" *ngIf="tasksFull?.tarea" >
+        <form [formGroup]="tareaForm">
+            <!-- Título editable -->
+            <div class="titulo-container">
+                <h1 *ngIf="!editandoTitulo" class="titulo-display" (click)="editarTitulo()">
+                {{ tareaForm.value.titulo }}
+                <span class="edit-icon">✏️</span>
+                </h1>
+
+                <div *ngIf="editandoTitulo" class="titulo-edit">
+                <input 
+                    type="text" 
+                    formControlName="titulo"
+                    class="titulo-input"
+                    maxlength="50"
+                    (keyup.enter)="guardarTitulo()"
+                    (keyup.escape)="cancelarEdicionTitulo()"
+                >
+                <div class="edit-buttons">
+                    <button class="btn-guardar"(click)="guardarTitulo()"
+                    [disabled]=" tareaForm.invalid || 
+                        !tareaForm.dirty">✓</button>
+                    <button class="btn-cancelar" (click)="cancelarEdicionTitulo()">✕</button>
+                </div>
+                </div>
+            </div>
+
+            <!-- Descripción editable -->
+            <div class="descripcion-container">
+                <p *ngIf="!editandoDescripcion" class="descripcion-display" (click)="editarDescripcion()">
+                {{ tareaForm.value.descripcion }}
+                <span class="edit-icon">✏️</span>
+                </p>
+
+                <div *ngIf="editandoDescripcion" class="descripcion-edit">
+                <textarea 
+                    formControlName="descripcion"
+                    class="descripcion-input"
+                    maxlength="500"
+                    (keyup.escape)="cancelarEdicionDescripcion()"
+                ></textarea>
+                <div class="edit-buttons">
+                    <button class="btn-guardar" (click)="guardarDescripcion()"
+                        [disabled]=" tareaForm.invalid || 
+                        !tareaForm.dirty">✓</button>
+                    <button class="btn-cancelar" (click)="cancelarEdicionDescripcion()">✕</button>
+                </div>
+                </div>
+            </div>
+        </form>
+    </header>
+    
+    <article class="subtareas-container" 
+            *ngIf="tarea?.subtasks && tasksFull.tarea.subtasks.length > 0">
+
+        <div class="title-group">
+            <p><strong>Subtareas</strong></p>
+            <button class="btn-nav btn-add" (click)="abrirSubtarea(tasksFull.tarea.id)">
+                <i class="fa-solid fa-plus"></i>
+            </button>
+        </div>
+
+        <ul class="subtareas-list">
+            <li *ngFor="let subTaks of tasksFull.tarea.subtasks" class="subtarea-item">
+                <!-- Título clickeable para expandir/contraer -->
+                <div class="subtarea-header" (click)="toggleSubtarea(subTaks.id)">
+                    <!-- Título clickeable para expandir/contraer -->
+                    <h2 class="subtarea-titulo">
+                    <span class="toggle-icon" [class.expanded]="subtareasUI[subTaks.id].expandida">
+                        {{ subtareasUI[subTaks.id].expandida ? '▼' : '▶' }}
+                    </span>
+
+                    <!-- Vista estática -->
+                    <span *ngIf="!subtareasUI[subTaks.id]?.editandoTitulo"
+                            class="titulo-subtarea-display"
+                            maxlength="50"
+                            (click)="editarTituloSubtarea(subTaks); detenerPropagacion($event)">
+                        {{ subTaks.titulo }}
+                        <span class="edit-icon-small">✏️</span>
+                    </span>
+
+                    <!-- Formulario de edición -->
+                    <form *ngIf="subtareasUI[subTaks.id]?.editandoTitulo"
+                            [formGroup]="subtaskForms[subTaks.id]"
+                            (click)="detenerPropagacion($event)"
+                            class="titulo-subtarea-edit">
+                        <input type="text" formControlName="titulo" class="titulo-subtarea-input"
+                            (keyup.enter)="guardarTituloSubtarea(subTaks)"
+                            (keyup.escape)="cancelarEdicionTituloSubtarea(subTaks)">
+
+                            <div *ngIf="subtaskForms[subTaks.id].get('titulo')?.invalid &&
+                                subtaskForms[subTaks.id].get('titulo')?.touched"
+                                class="error">
+                                <span class="error-message">El título no puede estar vacío</span>
+                            </div>
+                            
+                        <div class="edit-buttons-small">
+                        <button class="btn-guardar-small" (click)="guardarTituloSubtarea(subTaks)"
+                                [disabled]="subtaskForms[subTaks.id].get('titulo')?.invalid || 
+                                !subtaskForms[subTaks.id].get('titulo')?.dirty">✓</button>
+                        <button class="btn-cancelar-small" (click)="cancelarEdicionTituloSubtarea(subTaks)">✕</button>
+                        </div>
+                    </form>
+                    </h2>
+                </div>
+
+                <!-- Contenido expandible -->
+                <div class="subtarea-content" [class.expanded]="subtareasUI[subTaks.id].expandida">
+                    <ul class="subtarea-details">
+
+                        <li>
+                            <!-- Vista estática -->
+                            <span *ngIf="!subtareasUI[subTaks.id]?.editandoDescripcion"
+                                class="titulo-subtarea-display"
+                                maxlength="500"
+                                (click)="editarDescripcionSubtarea(subTaks); detenerPropagacion($event)">
+                            {{ subTaks.descripcion }}
+                            <span class="edit-icon-small">✏️</span>
+                            </span>
+
+                            <!-- Formulario de edición -->
+                            <form *ngIf="subtareasUI[subTaks.id]?.editandoDescripcion"
+                                [formGroup]="subtaskForms[subTaks.id]"
+                                (click)="detenerPropagacion($event)"
+                                class="titulo-subtarea-edit">
+                            <input type="text" formControlName="descripcion" class="titulo-subtarea-input"
+                                    (keyup.enter)="guardarDescripcionSubtarea(subTaks)"
+                                    (keyup.escape)="cancelarEdicionDescripcionSubtarea(subTaks)">
+
+                                    <div *ngIf="subtaskForms[subTaks.id].get('descripcion')?.invalid &&
+                                        subtaskForms[subTaks.id].get('descripcion')?.touched"
+                                        class="error">
+                                        <span class="error-message">La descripcion no puede estar vacía</span>
+                                    </div>
+                            <div class="edit-buttons-small">
+
+                                <button class="btn-guardar-small" (click)="guardarDescripcionSubtarea(subTaks)"
+                                  [disabled]="subtaskForms[subTaks.id].get('descripcion')?.invalid || 
+                                    !subtaskForms[subTaks.id].get('descripcion')?.dirty">✓</button>
+                                <button class="btn-cancelar-small" (click)="cancelarEdicionDescripcionSubtarea(subTaks)">✕</button>
+                            </div>
+                            </form>
+                        </li>
+                        
+                         <li class="estado-container">
+                            <strong>Estado:</strong> 
+                            <span class="estado" 
+                            [ngClass]="getStatusLightClass(subTaks.estados?.nombre?.toLowerCase()?.replace(' ', '-') || '')">
+                                {{ subTaks.estados?.nombre }}
+                            </span>
+                            <button 
+                                class="btn-avanzar" 
+                                (click)="cambiarEstado(subTaks)"
+                                [disabled]="subTaks.estados?.nombre === 'Terminado'">
+                                Avanzar estado
+                            </button>
+                        </li>
+                        
+                        <li class="fecha-section">
+                            <form [formGroup]="subtaskFechasForms[subTaks.id]" (ngSubmit)="cambiarFechas(subTaks)">
+                                <div class="fecha-container">
+                                    <strong>Fecha de inicio:</strong>
+                                    <input type="date" formControlName="startDate" class="fecha-input">
+                                    
+                                    <div *ngIf="subtaskFechasForms[subTaks.id].get('startDate')?.hasError('fechaPasada') &&
+                                        subtaskFechasForms[subTaks.id].get('startDate')?.touched" class="error">
+                                        <span class="error-message">La fecha no puede ser anterior a hoy</span>
+                                    </div>
+                                </div>
+
+                                <div class="fecha-container">
+                                    <strong>Fecha final:</strong>
+                                    <input type="date" formControlName="endDate" class="fecha-input">
+                                    
+                                    <div *ngIf="subtaskFechasForms[subTaks.id].errors?.['fechaFinInvalida'] &&
+                                                (subtaskFechasForms[subTaks.id].get('endDate')?.dirty || 
+                                                subtaskFechasForms[subTaks.id].get('endDate')?.touched)" class="error">
+                                        <span class="error-message">La fecha final no puede ser anterior a la fecha de inicio</span>
+                                    </div>
+                                </div>
+
+                                <strong *ngIf="subTaks.endDate">
+                                    {{ getDiasParaTarea(subTaks) }}
+                                </strong>
+
+                                <div class="acciones">
+                                    <button 
+                                        class="btn-actualizar" 
+                                        type="submit" 
+                                        [disabled]="
+                                            subtaskFechasForms[subTaks.id].invalid || 
+                                            !subtaskFechasForms[subTaks.id].dirty">
+                                        Cambiar fecha
+                                    </button>
+                                </div>
+                            </form>
+                        </li>
+                        
+                        <li class="usuarios-section">
+                            <form [formGroup]="subtaskAsignacionForms[subTaks.id]">
+                                <div class="usuarios-asignados">
+                                    <strong>Usuarios asignados:</strong>
+                                    <div class="usuarios-list">
+                                    <span *ngFor="let usuario of subTaks.asignados" class="usuario-tag">
+                                        {{ usuario.nombre }}
+                                        <button 
+                                        class="btn-remover" 
+                                        (click)="removerColaborador(subTaks, usuario.id)"
+                                        title="Remover usuario">
+                                        ×
+                                        </button>
+                                    </span>
+                                    <span *ngIf="!subTaks.asignados.length" class="sin-usuarios">
+                                        Sin usuarios asignados
+                                    </span>
+                                    </div>
+                                </div>
+
+                                <div class="asignar-colaborador">
+                                    <select formControlName="asignado"
+                                            (change)="listaColaborador(subTaks, $event)"
+                                            class="select-colaborador">
+                                    <option value="" disabled>Asignar colaborador</option>
+
+                                    <!-- ✅ Colaboradores filtrados (solo los no asignados) -->
+                                    <option *ngFor="let colaborador of colaboradoresDisponibles(subTaks)"
+                                            [value]="colaborador.id">
+                                        {{ colaborador.nombre }}
+                                    </option>
+
+                                    <!-- ✅ Opción si ya todos están asignados -->
+                                    <option *ngIf="colaboradoresDisponibles(subTaks).length === 0" disabled>
+                                        Todos los colaboradores ya están asignados
+                                    </option>
+                                    </select>
+                                </div>
+
+                                <div class="acciones">
+                                    <button 
+                                    class="btn-actualizar" 
+                                    (click)="agregarColaborador(subTaks)" 
+                                    [disabled]="subtaskAsignacionForms[subTaks.id].get('asignado')?.invalid">
+                                    Actualizar usuarios asignados
+                                    </button>
+                                </div>
+                            </form>
+
+                        </li>
+
+                        <li><strong>Fecha de creación:</strong> {{ subTaks.createdAt | date:'medium' }}</li>
+                        <li><strong>Fecha de modificación:</strong> {{ subTaks.updatedAt | date:'medium' }}</li>
+                        <li><strong>Fecha de finalización:</strong> 
+                            {{ subTaks.completedAt ? (subTaks.completedAt | date:'medium') : 'No finalizada' }}
+                        </li>
+                        <div class="acciones">
+                            <button class="btn-eliminar" (click)="deleteSubTask(subTaks)">
+                                Eliminar Subtarea <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </ul> 
+                </div> 
+            </li> 
+        </ul> 
+    </article> 
+</section> 
+
+<app-subtask
+    *ngIf="viewSubTaskForm && idTareaPadre"
+    [taskId]="idTareaPadre"
+    [cerrarAlClickAfuera]="true"
+    (cerrar)="viewSubTaskForm = false">
+</app-subtask>
+

@@ -1,0 +1,106 @@
+<nav class="container-nav">
+        <h1><a [routerLink]="['boards']" class="enlace">Meshwork</a></h1>
+        <ul class="content-ul">
+            <li class="search-container">
+                <div class="search-modern">
+                    <input
+                        type="text"
+                        placeholder="Buscar por correo..."
+                        [(ngModel)]="busquedaCorreo"
+                        (input)="buscarUsuarios()"
+                        (focus)="mostrarResultados = true"
+                        (blur)="ocultarConRetardo()"
+                        #searchInput
+                    />
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                
+                <!-- Loading state -->
+                <ul *ngIf="mostrarResultados && cargandoUsuarios" class="dropdown-result">
+                    <li class="dropdown-loading">
+                        <div class="loading-spinner"></div>
+                        Buscando usuarios...
+                    </li>
+                </ul>
+                
+                <!-- Results -->
+                <ul *ngIf="mostrarResultados && !cargandoUsuarios && usuariosEncontrados.length > 0" class="dropdown-result">
+                    <li *ngFor="let usuario of usuariosEncontrados" class="usuario-item">
+                        <div class="usuario-avatar">
+                            {{ getInitials(usuario.nombre) }}
+                        </div>
+                        <div class="usuario-info">
+                            <div class="usuario-nombre">{{ usuario.nombre }}</div>
+                            <div class="usuario-email">{{ usuario.email }}</div>
+                            
+                            <span *ngIf="usuario.estadoSolicitud === 'pendiente' && usuario.fueEnviadaPorMi">Solicitud enviada</span>
+                            <span *ngIf="usuario.estadoSolicitud === 'aceptada'">Ya es colaborador</span>
+
+                            <button
+                            *ngIf="usuario.estadoSolicitud !== 'aceptada' && usuario.estadoSolicitud !== 'pendiente'"
+                            class="btn-solicitud"
+                            (click)="enviarSolicitud(usuario, $event)">
+                            <i class="fa-regular fa-paper-plane"></i> Enviar
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+                
+                <!-- Empty state -->
+                <ul *ngIf="mostrarResultados && !cargandoUsuarios && busquedaCorreo.trim() && usuariosEncontrados.length === 0" class="dropdown-result">
+                    <li class="dropdown-empty">
+                        <i class="fa-solid fa-user-slash" style="margin-right: 8px; opacity: 0.5;"></i>
+                        No se encontraron usuarios
+                    </li>
+                </ul>
+            </li>
+
+            <li>
+                <span class="user-name">{{userName}}</span>
+            </li>
+
+            <button class="btn-nav btn-notification" (click)="toggleNotificaciones()" title="Notificaciones">
+                <i class="fa-regular fa-bell"></i>
+                <span *ngIf="notiNoLeidas > 0" class="noti-badge">{{ notiNoLeidas }}</span>
+            </button>
+
+            <li>
+                <button class="btn-nav btn-add" (click)="createTask()" title="Crear tarea">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+            </li>
+
+            <li class="buttons-group">
+                <button class="btn-nav btn-logout" (click)="logout()" title="Cerrar sesión">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </button>
+            </li>
+        </ul>
+    </nav>
+
+    <app-notificaciones
+        *ngIf="viewNotification"
+        [notificaciones]="notificaciones"
+        [cargando]="cargandoNotificaciones"
+        (cerrar)="viewNotification = false"
+        (marcarTodasLeidas)="marcarNotificacionesLeidas()"
+        (notificacionClick)="onNotificacionClick($event)"
+        (solicitudAceptada)="onSolicitudAceptada($event)"
+        (solicitudRechazada)="onSolicitudRechazada($event)">
+    </app-notificaciones>
+    
+    <app-task 
+        *ngIf="viewCreateTask" 
+        (cerrar)="viewCreateTask = false"
+        (tareaCompuestaCreada)="abrirSubtarea($event)">
+    </app-task>
+
+    <app-subtask
+        *ngIf="viewSubTaskForm && idTareaPadre"
+        [taskId]="idTareaPadre"
+        (cerrar)="viewSubTaskForm = false"
+        [cerrarAlClickAfuera]="false">
+        
+    </app-subtask>
+
+    <router-outlet></router-outlet>

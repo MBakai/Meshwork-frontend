@@ -1,0 +1,68 @@
+<section class="content" (click)="cerrarModal()">
+    
+    <form [formGroup]="taskForm" (ngSubmit)="onCreateTask()" (click)="stopPropagation($event)" class="form-content">
+        <h2>Crear Task</h2>
+
+        <div class="caja-campos" *ngIf="type?.value !== 'COMPOSITE'">      
+            <label for="type">Tipo de tarea</label>
+            <select formControlName="type" class="input-task"
+                [ngClass]="{'input-error': type?.invalid && (type?.touched || type?.dirty)}"
+                [ngClass]="{'input-success': type?.valid}">
+                
+                <option value="">Seleccionar...</option>
+                <option value="SIMPLE">Simple</option>
+                <option value="COMPOSITE">Compuesta</option>
+            </select>
+            <div *ngIf="type?.invalid && type?.touched" class="error">
+                <span class="error-message" *ngIf="type?.errors?.['required']">Campo Requerido</span>
+            </div>
+        </div>
+
+        <div class="caja-campos">
+
+            <label for="">Titulo</label>
+            <input type="text" formControlName="titulo" class="input-task" maxlength="50"
+                [ngClass]="{'input-error': titulo?.invalid && (titulo?.touched || titulo?.dirty)}"
+                [ngClass]="{'input-success': titulo?.valid}">
+
+            <div *ngIf="titulo?.invalid && titulo?.touched" class="error">
+                <span class="error-message" *ngIf="titulo?.errors?.['required']">Campo Requerido</span>
+            </div>
+        </div>
+
+        <div class="caja-campos">
+            <label for="">Descripción</label>
+            <textarea formControlName="descripcion" class="input-task" maxlength="500"
+                [ngClass]="{'input-error': descripcion?.invalid && (descripcion?.touched || descripcion?.dirty)}"
+                [ngClass]="{'input-success': descripcion?.valid}"></textarea>
+                
+            <div *ngIf="descripcion?.invalid && descripcion?.touched" class="error">
+                <span class="error-message" *ngIf="descripcion?.errors?.['required']">Campo Requerido</span>
+            </div>
+        </div>
+
+        <div *ngIf="tipoActual === 'SIMPLE'">
+            <div class="caja-campos">
+                <label>Fecha de inicio</label>
+                <input type="date" formControlName="startDate" class="input-task" />
+    
+                <div *ngIf="taskForm.get('startDate')?.hasError('fechaPasada') && taskForm.get('startDate')?.touched" class="error">
+                    <span class="error-message">La fecha no puede ser anterior a hoy</span>
+                </div>
+            </div>
+
+            <div class="caja-campos">
+                <label>Fecha final</label>
+                <input type="date" formControlName="endDate" class="input-task" />
+                <div *ngIf="taskForm.errors?.['fechaFinInvalida'] && (taskForm.get('endDate')?.dirty || taskForm.get('endDate')?.touched)" class="error">
+                    <span class="error-message">La fecha final no puede ser anterior a la fecha de inicio</span>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-task" [disabled]="taskForm.invalid">
+            {{ tipoActual === 'SIMPLE' ? 'Crear' : 'Siguiente' }}
+        </button>
+    </form>
+</section>
+

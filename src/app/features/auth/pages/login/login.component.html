@@ -1,0 +1,51 @@
+<section class="content" (click)="cerrarModal()">
+  <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="form-content" (click)="stopPropagation($event)">
+    
+    <h1 *ngIf="!modoRecoveryPassword">Login</h1>
+    <h1 *ngIf="modoRecoveryPassword">Recuperar Contraseña</h1>
+
+    <div class="caja-campos">
+      <label for="">Email</label>
+      <input type="email" class="input-login" formControlName="email" 
+          [ngClass]="{'input-error': email?.invalid && (email?.touched || email?.dirty), 'input-success': email?.valid}">
+      <div *ngIf="email?.invalid && email?.touched" class="error">
+          <span class="error-message" *ngIf="email?.errors?.['required']">Campo Requerido</span>
+      </div>
+    </div>
+
+    <!-- Mostrar contraseña solo si NO estamos en modo recuperación -->
+    <div *ngIf="!modoRecoveryPassword" class="caja-campos">
+      <div class="input-wrapper">
+        <label for="">Contraseña</label>
+        <input [type]="mostrarPassword ? 'text' : 'password'" class="input-login" formControlName="password"
+            [ngClass]="{'input-error': password?.invalid && (password?.touched || password?.dirty), 'input-success': password?.valid}">
+        <button 
+            type="button"
+            class="toggle-password-btn"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+          <i [class]="mostrarPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+        </button>
+      </div>
+      <div *ngIf="password?.invalid && password?.touched" class="error">
+        <span class="error-message" *ngIf="password?.errors?.['required']">Campo Requerido</span>
+      </div>
+    </div>
+
+    <!-- Cambiar texto/link según modo actual -->
+    <div>
+      <a href="#" (click)="toggleForgotPasswordMode(); $event.preventDefault()">
+        {{ modoRecoveryPassword ? 'Volver al login' : '¿Olvidaste tu contraseña?' }}
+      </a>
+    </div>
+
+    <div>
+      <button type="submit" 
+              [disabled]="modoRecoveryPassword ? email?.invalid : loginForm.invalid"
+              class="btn-login">
+        {{ modoRecoveryPassword ? 'Enviar email de verificación' : 'Ingresar' }}
+      </button>
+    </div>
+    
+  </form>
+</section>

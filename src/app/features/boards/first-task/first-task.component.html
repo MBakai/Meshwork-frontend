@@ -1,0 +1,18 @@
+<div class="container">
+  <button 
+    #createButton
+    class="create-task-button"
+    (click)="createTask()">
+    
+    <div class="background-pattern"></div>
+    <div class="plus-icon"></div>
+    <div class="button-text">Crear tarea</div>
+    
+    <div class="button-subtitle">
+      Comienza organizando tus actividades.<br>
+      Haz clic aquí para crear tu primera tarea.
+    </div>
+  </button>
+</div>
+
+<app-task *ngIf="viewCreateTask" (cerrar)="viewCreateTask = false"></app-task>
