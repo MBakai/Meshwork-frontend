@@ -25,7 +25,6 @@ export class NotificacionesService {
 
     this.socket.on('connect', () => {
       this.isConnected = true;
-      console.log('✅ Conectado al servidor WebSocket con el userID', userId );
     });
 
     this.socket.on('connect_error', (err) => {

@@ -30,12 +30,12 @@ export const dashboardRoutes: Routes = [
         loadComponent: () =>
           import('./boards/task-board/task-board.component').then(m => m.TaskBoardComponent),
       },
-      // {
-      //   path: 'subtask',
-      //   canActivate: [authGuard],
-      //   loadComponent: () =>
-      //     import('./boards/subtask/subtask.component').then(m => m.SubtaskComponent),
-      // },
+      {
+        path: 'subtask-board-colaborador/:id',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./boards/subtask-board-colaborador/subtask-board-colaborador.component').then(m => m.SubtaskBoardColaboradorComponent),
+      },
       {
         path: 'users',
         canActivate: [authGuard],

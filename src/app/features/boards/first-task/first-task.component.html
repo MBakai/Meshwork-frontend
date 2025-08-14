@@ -15,4 +15,12 @@
   </button>
 </div>
 
-<app-task *ngIf="viewCreateTask" (cerrar)="viewCreateTask = false"></app-task>
+<app-task *ngIf="viewCreateTask"
+(tareaCompuestaCreada)="createSubTask($event)"
+ (cerrar)="viewCreateTask = false">
+</app-task>
+
+<app-subtask *ngIf="viewCreateSubtask && idTaskPadre"
+  [taskId]="idTaskPadre"
+  (cerrar)="viewCreateSubtask = false">
+</app-subtask>

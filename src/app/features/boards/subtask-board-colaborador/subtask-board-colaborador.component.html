@@ -1,0 +1,89 @@
+<section class="proyecto-container">
+    <header class="proyecto-header" *ngIf="subtasksColaborador">
+        <div class="titulo-container">
+            <h1 class="titulo-display">
+                {{ subtasksColaborador.titulo }}
+            </h1>
+        </div>
+
+        <div class="descripcion-container">
+            <p class="descripcion-display">
+                {{ subtasksColaborador.descripcion }}
+            </p>
+        </div>
+    </header>
+    
+    <article class="subtareas-container" *ngIf="subtasksColaborador">
+        <ul class="subtareas-list">
+            <li *ngFor="let subTaks of subtasksColaborador.subtasks" class="subtarea-item">
+                <div class="subtarea-header" (click)="toggleSubtarea(subTaks.id)">
+                    <!-- Título clickeable para expandir/contraer -->
+                    <h2 class="subtarea-titulo">
+                        <span class="toggle-icon" [class.expanded]="subtareasUI[subTaks.id].expandida">
+                            {{ subtareasUI[subTaks.id].expandida ? '▼' : '▶' }}
+                        </span>
+                        <span class="titulo-subtarea-display">{{ subTaks.titulo }}</span>
+                    </h2>
+                </div>
+
+                <!-- Contenido expandible -->
+                <div class="subtarea-content" [class.expanded]="subtareasUI[subTaks.id].expandida">
+                    <ul class="subtarea-details">
+                        <li>
+                            <!-- Vista estática -->
+                            <span>{{ subTaks.descripcion }}</span>
+                        </li>
+                        
+                        <li class="estado-container">
+                            <strong>Estado:</strong> 
+                            <span class="estado" 
+                                [ngClass]="getStatusLightClass(subTaks.estados.nombre.toLowerCase().replace(' ', '-') || '')">
+                                {{ subTaks.estados.nombre }}
+                            </span>
+                            <button 
+                                class="btn-avanzar" 
+                                (click)="cambiarEstado(subTaks)"
+                                [disabled]="subTaks.estados.nombre === 'Terminado' || subTaks.id !== subtaskId">
+                                Avanzar estado
+                            </button>
+                        </li>
+                        
+                        <li class="fecha-section">
+                            <div class="fecha-container">
+                                <strong>Fecha de inicio: {{subTaks.startDate}}</strong>
+                            </div>
+
+                            <div class="fecha-container">
+                                <strong>Fecha final: {{subTaks.endDate}}</strong>
+                            </div>
+
+                            <strong *ngIf="subTaks.endDate">
+                                {{ getDiasParaTarea(subTaks) }}
+                            </strong>
+                        </li>
+                        
+                        <li class="usuarios-section">
+                            <div class="usuarios-asignados">
+                                <strong>Usuarios asignados:</strong>
+                                <div class="usuarios-list">
+                                    <span *ngFor="let usuario of subTaks.asignados" class="usuario-tag">
+                                        {{ usuario.nombre }}
+                                    </span>
+                                    <span *ngIf="!subTaks.asignados?.length" class="sin-usuarios">
+                                        Sin usuarios asignados
+                                    </span>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li><strong>Fecha de creación:</strong> {{ subTaks.createdAt | date:'medium' }}</li>
+                        <li><strong>Fecha de modificación:</strong> {{ subTaks.updatedAt | date:'medium' }}</li>
+                        <li><strong>Fecha de finalización:</strong> 
+                            {{ subTaks.completedAt ? (subTaks.completedAt | date:'medium') : 'No finalizada' }}
+                        </li>
+                    </ul> 
+                </div>
+            </li> 
+        </ul> 
+    </article> 
+</section>

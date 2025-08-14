@@ -2,8 +2,8 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TaskService } from '../../../core/task-service/task.service';
-import { Task } from './interface/task.interface';
-import { TaskType } from './interface/type.enum';
+import { Task } from '../../../core/task-service/interfaces/task.interface';
+import { TaskType } from '../../../core/task-service/interfaces/type.enum';
 import { noFechaPasadaValidator } from './validators/fecha-inicio-no-valida.validator';
 import { fechaFinNoValidator } from './validators/fecha-final-no-valida.validator';
 import { TaskEventService } from '../../../core/eventos-service/task-event.service';
@@ -74,12 +74,14 @@ export class TaskComponent implements OnInit {
         });
       }
 
+      this.ajustarValidadoresPorTipo(newType)
       this.tipoActual = newType;
     });
-
+    
     if (this.taskId) {
       this.isEditMode = true;
       this.loadTask();
+      
     }
   }
 
@@ -96,12 +98,14 @@ export class TaskComponent implements OnInit {
         descripcion: task.descripcion,
         type: task.type,
         startDate: formatDate(task.startDate),
-        endDate: formatDate(task.endDate)
+        endDate: formatDate(task.endDate),
+        
       });
         this.tipoActual = task.type;
 
         this.taskTieneSubtasks = Array.isArray(task.subtasks) && task.subtasks.length > 0;
-    });
+        this.ajustarValidadoresPorTipo(task.type);
+      });
   }
 
    get titulo() {
@@ -123,7 +127,7 @@ export class TaskComponent implements OnInit {
 
       const formData = this.taskForm.value;
       const tipoTarea = formData.type;
-
+      
       if (!formData.startDate) delete formData.startDate;
       if (!formData.endDate) delete formData.endDate;
 
@@ -138,17 +142,17 @@ export class TaskComponent implements OnInit {
       this.taskService.createTask(dataConFecha).subscribe({
         next: (response) => {
           this.backendErrors = '';
-
+          
           if (tipoTarea === 'SIMPLE') {
             this.taskForm.reset();
             this.taskEventService.emitTaskCreated();
             this.cerrarModal(); 
             this.messageSuccess();
           } else {
-            // Guarda ID u objeto de tarea creada 
+            // Guarda ID u objeto de tarea creada
             const taskId = response.task.id;
-            this.taskForm.reset();
             this.tareaCompuestaCreada.emit(taskId); 
+            this.taskForm.reset();
             this.cerrarModal();
           }
         },
@@ -163,13 +167,21 @@ export class TaskComponent implements OnInit {
       });
 
     } else {
-
+      
      const formData = this.taskForm.value;
      const tipoTarea = formData.type;
+     console.log('valores formulario', formData);
      
-      if (!formData.startDate) delete formData.startDate;
-      if (!formData.endDate) delete formData.endDate;
-
+     
+      if (tipoTarea === 'COMPOSITE') {
+        formData.startDate = formData.startDate ? formData.startDate : null;
+        formData.endDate = formData.endDate ? formData.endDate : null;
+      }
+      // Si es SIMPLE, elimina los campos si no tienen valor (como antes)
+      else {
+        if (!formData.startDate) delete formData.startDate;
+        if (!formData.endDate) delete formData.endDate;
+      }
       this.taskService.updateTask(this.taskId!, formData).subscribe({
         next: (response) => {
           if (tipoTarea === 'SIMPLE') {
@@ -178,7 +190,7 @@ export class TaskComponent implements OnInit {
             this.messageSuccess();
           } else {
             // Guarda ID u objeto de tarea creada 
-            const taskId = response.id;
+            const taskId = this.taskId!;
             this.taskForm.reset();
             this.tareaCompuestaCreada.emit(taskId); 
             this.cerrarModal();
@@ -197,6 +209,18 @@ export class TaskComponent implements OnInit {
   }
   stopPropagation(event: MouseEvent){
     event.stopPropagation();
+  }
+
+  private ajustarValidadoresPorTipo(tipo: string) {
+    if (tipo === 'COMPOSITE') {
+      this.taskForm.get('startDate')?.clearValidators();
+      this.taskForm.get('endDate')?.clearValidators();
+    } else {
+      this.taskForm.get('startDate')?.setValidators(Validators.required);
+      this.taskForm.get('endDate')?.setValidators(Validators.required);
+    }
+    this.taskForm.get('startDate')?.updateValueAndValidity();
+    this.taskForm.get('endDate')?.updateValueAndValidity();
   }
 
   messageSuccess(){

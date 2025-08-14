@@ -1,6 +1,9 @@
 
 export const environment = {
     production: false,
-    apiUrl: 'http://localhost:3000/api', // URL de tu backend NestJS
-    apiSocket: 'http://localhost:3000'
+    apiUrl: 'http://localhost:3000/meshwork/api', // URL de tu backend NestJS
+    apiSocket: 'http://localhost:3000',
+    recaptcha: {
+      siteKey: 'TU_SITE_KEY'
+    }
   };

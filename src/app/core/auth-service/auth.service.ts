@@ -3,11 +3,12 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 
-import { User } from '../../shared/interface/user.interface';
+import { User } from './interface/user.interface';
 import { environment } from '../../../environments/environment';
-import { LoginRequest } from '../../shared/interface/login.interface';
-import { AuthResponse } from '../../shared/interface/auth-response.interface';
-import { ResetPassword } from '../../shared/interface/reset-password.interface';
+import { LoginRequest } from './interface/login.interface';
+import { AuthResponse } from './interface/auth-response.interface';
+import { ResetPassword } from './interface/reset-password.interface';
+import { UpdateUserResponse } from './interface/updateUserResponse.interface';
 @Injectable({
   providedIn: 'root'
 })
@@ -62,6 +63,10 @@ export class AuthService {
 
   resetPassword(data: ResetPassword) {
     return this.http.post(`${this.apiUrl}/user/reset-password`, data);
+  }
+
+  updateUser(id: string, data: { nombre: string }): Observable<UpdateUserResponse> {
+    return this.http.patch<UpdateUserResponse>(`${this.apiUrl}/user/edit-user/${id}`, data);
   }
 
 

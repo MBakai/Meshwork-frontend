@@ -4,12 +4,12 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { CommonModule } from '@angular/common';
  import { take } from 'rxjs';
 import { TaskService } from '../../../core/task-service/task.service';
-import { TaskFull } from '../task/interface/task-full.interface';
-import { UpdateSubTask } from '../subtask/interfaces/updateSubTask.interface';
+import { TaskFull } from '../../../core/task-service/interfaces/task-full.interface';
+import { UpdateSubTask } from '../../../core/subTask-service/interfaces/updateSubTask.interface';
 import { SubtaskService } from '../../../core/subTask-service/subtask.service';
-import { Subtask } from '../subtask/interfaces/subtask.interface';
+import { Subtask } from '../../../core/subTask-service/interfaces/subtask.interface';
 import { calcularDiasRestantes } from '../../../shared/utils/dias-restantes.utils';
-import { Estado } from '../../../shared/interface/estados.interface';
+import { Estado } from '../../../core/auth-service/interface/estados.interface';
 import { noFechaPasadaValidator } from '../task/validators/fecha-inicio-no-valida.validator';
 import { fechaFinNoValidator } from '../task/validators/fecha-final-no-valida.validator';
 import Swal from 'sweetalert2'
@@ -54,6 +54,7 @@ export class TaskBoardComponent implements OnInit {
 
   viewSubTaskForm = false;
   idTareaPadre: string | null = null;
+  diasRestantes: string = '';
 
   constructor(
     private readonly taskService: TaskService,
@@ -70,14 +71,13 @@ export class TaskBoardComponent implements OnInit {
         this.loadTaskFull(taskId);
     }
 
-    this.loadEstados(); // <-- Agrega esto
+    this.loadEstados(); 
   }
 
   loadEstados(): void {
       this.taskService.getStatus().subscribe({
         next: (data) => {
           this.estados = data;
-          console.log('Estados cargados:', this.estados);
         },
         error: (err) => console.error('Error al cargar estados', err)
     });
@@ -87,10 +87,12 @@ export class TaskBoardComponent implements OnInit {
     this.taskService.getTaskFull(taskId).subscribe({
       next: (data: TaskFull) => {
         this.tasksFull = data;
+        this.tasksFull.tarea.subtasks = this.tasksFull.tarea.subtasks.map(sub => ({
+          ...sub,
+          diasRestantesTexto: this.getDiasParaTarea(sub.endDate)
+        }));
+        
         this.counSubTask =  data.tarea.subtasks.length;
-        console.log(this.counSubTask);
-        
-        
         this.inicializarSubtareasUI();
         this.inicializarFormulariosSubtareas();
 
@@ -328,7 +330,6 @@ export class TaskBoardComponent implements OnInit {
     const actualIndex = this.estados.findIndex(e => e.id === actualId);
 
     if (actualIndex === -1 || actualIndex + 1 >= this.estados.length) {
-      console.warn(`No se encontró el siguiente estado para id: ${actualId}`);
       return;
     }
 
@@ -373,17 +374,33 @@ export class TaskBoardComponent implements OnInit {
       startDate: form.get('startDate')?.value,
       endDate: form.get('endDate')?.value
     };
-    console.log(payload);
-    
 
     this.subTaskService.updateSubTask(sub.id!, payload).subscribe({
       next: () => {
+        if (payload.startDate) {
+        sub.startDate = payload.startDate;
+      }
+      if (payload.endDate) {
+        sub.endDate = payload.endDate;
+        sub.diasRestantesTexto = this.getDiasParaTarea(payload.endDate);
+      }
         showTaskSuccess('update-date');
       },
       error: (err) => {
         console.error('Error al actualizar fechas', err);
       }
     });
+  }
+  
+  getDiasParaTarea(endDate: string | null) {
+    if (!endDate) return '';
+    
+    const dias = calcularDiasRestantes(endDate);
+    
+    if (dias > 1) return `Faltan ${dias} días`;
+    if (dias === 1) return 'Falta 1 día';
+    if (dias === 0) return 'Vence hoy';
+    return `Venció hace ${Math.abs(dias)} día(s)`;
   }
 
   listaColaborador(sub: Subtask, event: Event) {
@@ -441,20 +458,9 @@ export class TaskBoardComponent implements OnInit {
     });
   }
 
-  getDiasParaTarea(tarea: Subtask): string {
-    if (!tarea.endDate) return '';
-    const dias = calcularDiasRestantes(tarea.endDate);
-    if (dias > 1) return `Faltan ${dias} días`;
-    if (dias === 1) return 'Falta 1 día';
-    if (dias === 0) return 'Vence hoy';
-    return `Venció hace ${Math.abs(dias)} día(s)`;
-  }
-
   detenerPropagacion(event: Event) {
     event.stopPropagation();
   }
-
- 
 
   abrirSubtarea(taskId: string) {
     this.taskService.getTaskFull(taskId).subscribe({
@@ -481,30 +487,42 @@ export class TaskBoardComponent implements OnInit {
   }
 
   deleteSubTask(sub: Subtask): void {
+  // 1. Verificar si hay usuarios asignados
+  if (sub.asignados && sub.asignados.length > 0) {
     Swal.fire({
-      title: '¿Estás seguro?',
-      text: 'Esta acción eliminará la tarea permanentemente.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
-        backdrop: false,  
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.subTaskService.deleteSubTask(sub.id).subscribe({
-          next: () => {
-            this.tasksFull.tarea.subtasks = this.tasksFull.tarea.subtasks.filter(s => s.id !== sub.id);
-
-            Swal.fire('Eliminada', 'La tarea fue eliminada.', 'success');
-          },
-          error: (err) => {
-            console.error('Error al eliminar tarea:', err);
-            Swal.fire('Error', 'No se pudo eliminar la tarea.', 'error');
-          }
-        });
-      }
+      title: 'No se puede eliminar',
+      text: 'Esta subtarea tiene usuarios asignados. Desasígnalos primero.',
+      icon: 'error',
+      confirmButtonText: 'Entendido',
+      backdrop: false
     });
+    return; // Detener la ejecución aquí
   }
+
+  // 2. Si no hay asignados, mostrar confirmación
+  Swal.fire({
+    title: '¿Estás seguro?',
+    text: 'Esta acción eliminará la subtarea permanentemente.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar',
+    backdrop: false
+  }).then((result) => {
+    if (result.isConfirmed) {
+      this.subTaskService.deleteSubTask(sub.id).subscribe({
+        next: () => {
+          this.tasksFull.tarea.subtasks = this.tasksFull.tarea.subtasks.filter(s => s.id !== sub.id);
+          Swal.fire('Eliminada', 'La subtarea fue eliminada.', 'success');
+        },
+        error: (err) => {
+          console.error('Error al eliminar subtarea:', err);
+          Swal.fire('Error', 'No se pudo eliminar la subtarea.', 'error');
+        }
+      });
+    }
+  });
+}
 
   messageInvalid() {
     Swal.fire({

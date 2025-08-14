@@ -1,0 +1,352 @@
+/* Panel de Subtareas */
+.panel-subtareas {
+    position: fixed;
+    top: 80px; /* Ajustado para estar debajo del navbar */
+    right: 20px;
+    width: 400px;
+    max-width: 90vw;
+    max-height: 500px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    animation: slideInFromRight 0.3s ease-out;
+}
+
+/* Header del Panel */
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.panel-header h4 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.panel-header button {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(5px);
+}
+
+.panel-header button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.panel-header button:active {
+    transform: scale(0.95);
+}
+
+.panel-subtareas {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.panel-subtareas.cerrando {
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+/* Lista de Subtareas */
+.subtask-lista {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 400px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+.subtask-lista::-webkit-scrollbar {
+    width: 6px;
+}
+
+.subtask-lista::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.subtask-lista::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+.subtask-lista::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Items de Subtarea */
+.subtask-lista li {
+    padding: 18px 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    position: relative;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.subtask-lista li:hover {
+    background: rgba(102, 126, 234, 0.05);
+    transform: translateX(2px);
+}
+
+.subtask-lista li:last-child {
+    border-bottom: none;
+}
+
+/* Icono de subtarea */
+.subtask-lista li::before {
+    content: '📋';
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* Contenido de la subtarea */
+.subtask-contenido {
+    flex: 1;
+    min-width: 0; /* Para permitir text-overflow */
+}
+
+.subtask-titulo {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.task-info {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.task-author {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.subtask-asignada {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    border-left: 3px solid #667eea;
+}
+
+.view-more-link {
+    color: #667eea;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    padding: 4px 0;
+}
+
+.view-more-link:hover {
+    color: #5a67d8;
+    text-decoration: underline;
+    transform: translateX(2px);
+}
+
+/* Estado vacío */
+.subtask-vacia {
+    padding: 40px 20px;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+}
+
+.subtask-vacia i {
+    font-size: 48px;
+    color: #ccc;
+    margin-bottom: 15px;
+    display: block;
+}
+
+/* Estado de carga */
+.subtask-loading {
+    padding: 30px;
+    text-align: center;
+    color: #667eea;
+    font-size: 14px;
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+}
+
+/* Contador de subtareas */
+.subtask-contador {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 0 0 15px 15px;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Animaciones */
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .panel-subtareas {
+        top: 70px;
+        right: 10px;
+        width: 350px;
+        max-height: 450px;
+    }
+    
+    .panel-header {
+        padding: 15px;
+    }
+    
+    .panel-header h4 {
+        font-size: 16px;
+    }
+    
+    .subtask-lista {
+        max-height: 320px;
+    }
+    
+    .subtask-lista li {
+        padding: 15px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .panel-subtareas {
+        top: 60px;
+        right: 5px;
+        left: 5px;
+        width: auto;
+        max-height: 400px;
+    }
+    
+    .panel-header {
+        padding: 12px 15px;
+    }
+    
+    .panel-header h4 {
+        font-size: 15px;
+    }
+    
+    .subtask-lista {
+        max-height: 280px;
+    }
+    
+    .subtask-lista li {
+        padding: 12px;
+        font-size: 12px;
+    }
+    
+    .subtask-contador {
+        padding: 8px 15px;
+        font-size: 13px;
+    }
+}
+
+/* Overlay para cerrar al hacer click fuera */
+.panel-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.1);
+    z-index: 9998;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Estados especiales */
+.subtask-urgente {
+    border-left: 4px solid #dc3545;
+}
+
+.subtask-urgente .subtask-titulo {
+    color: #dc3545;
+}
+
+.subtask-proximoVencimiento {
+    border-left: 4px solid #ffc107;
+}
+
+.subtask-proximoVencimiento .subtask-titulo {
+    color: #856404;
+}

@@ -151,7 +151,6 @@ export class RegistroComponent implements OnInit {
 
     if (this.registroForm.valid) {
 
-
       const formData = {
         ...this.registroForm.value,
         id_genero: Number(this.registroForm.value.id_genero), // <-- convertir a número
@@ -167,10 +166,26 @@ export class RegistroComponent implements OnInit {
           this.showVerificationModal = true;
           
         },
-        error: (error) => {
-          console.error('Error del backend:', error);
-          if (error.status === 400) {
-            this.backendErrors = error.error.message;
+        error: (err) => {
+          const mensaje = err.error?.message || 'Error inesperado';
+          const code = err.error?.Code;
+          if (err.status === 409) {
+            Swal.fire('Registro en conflicto', 'El correo ya está registrado.', 'warning');
+          
+          } else if(err.status === 400){
+            Swal.fire('Datos invalidos', 'Las contraseñas no coinciden.', 'warning');
+          
+          } else if(err.status === 404){
+            switch (code) {
+              case 'RESOURCE_NOT_FOUND_GENDER':
+                Swal.fire('Recurso no encontrado', 'El genero no existe.', 'error');
+                break;
+              case 'RESOURCE_NOT_FOUND_ROL':
+                Swal.fire('Recurso no encontrado', 'El rol no existe.', 'error');
+                break;
+            }
+          } else {
+            Swal.fire('Error', 'Ocurrió un error inesperado en el registro', 'error');
           }
         }
       });

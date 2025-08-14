@@ -2,7 +2,7 @@
 .content {
   display: grid;
   grid-template-columns: 35px 500px 35px;
-  margin-top: 50px;
+  margin-top: 5px;
   height: 500px;
   align-items: center;
   justify-content: center;

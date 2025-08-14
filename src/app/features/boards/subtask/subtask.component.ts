@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Task } from '../task/interface/task.interface';
+import { Task } from '../../../core/task-service/interfaces/task.interface';
 import { fechaFinNoValidator } from '../task/validators/fecha-final-no-valida.validator';
 import { noFechaPasadaValidator } from '../task/validators/fecha-inicio-no-valida.validator';
 import { SubtaskService } from '../../../core/subTask-service/subtask.service';
 import { TaskEventService } from '../../../core/eventos-service/task-event.service';
-import { CreateSubTask } from './interfaces/createSubtask.interface';
+import { CreateSubTask } from '../../../core/subTask-service/interfaces/createSubtask.interface';
 import Swal from 'sweetalert2'
 
 @Component({
@@ -61,6 +61,8 @@ export class SubtaskComponent {
         startDate,
         endDate
       };
+      console.log('datos tarea:', subtaskData);
+      
 
       this.subTaskService.createSubTask(subtaskData, this.taskId).subscribe({
         next: () => {

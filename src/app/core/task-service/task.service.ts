@@ -2,12 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
-import { Task } from '../../features/boards/task/interface/task.interface';
-import { CreateTask } from '../../features/boards/task/interface/create-task.interface';
-import { CreateTaskResponse } from '../../features/boards/task/interface/create-task-response.interface';
-import { Estado } from '../../shared/interface/estados.interface';
-import { TaskFull } from '../../features/boards/task/interface/task-full.interface';
-import { UpdateTask } from '../../features/boards/task/interface/updateTask.inteface';
+import { Task } from './interfaces/task.interface';
+import { CreateTask } from './interfaces/create-task.interface';
+import { CreateTaskResponse } from './interfaces/create-task-response.interface';
+import { Estado } from '../auth-service/interface/estados.interface';
+import { TaskFull } from './interfaces/task-full.interface';
+import { UpdateTask } from './interfaces/updateTask.inteface';
+import { TaskColaborador } from './interfaces/task-colaborador.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -36,6 +37,10 @@ export class TaskService {
 
   getTaskFull(id: string): Observable<TaskFull> {
     return this.http.get<TaskFull>(`${this.apiUrl}/tasks/get-full/${id}`);
+  }
+
+  getTaskkparcialColaborador(id: string): Observable<TaskColaborador> {
+    return this.http.get<TaskColaborador>(`${this.apiUrl}/tasks/get-task-colab/${id}`);
   }
 
   cambiarEstado(taskId: string, estadoId: number): Observable<any> {

@@ -57,6 +57,11 @@
                 <button (click)="viewTaskDetalis(task.id)">ver mas ... <i class="fa-solid fa-eye"></i></button>
               </section>
 
+              <section class="subtasks" *ngIf="task.type === 'COMPOSITE' && task.subtasks.length === 0">
+
+                <button (click)="formOpenSubtask(task.id)">Agregar sub-tarea<i class="fa-solid fa-eye"></i></button>
+              </section>
+
               <div
                   *ngIf="task.subtasks.length === 0 && task.type === 'SIMPLE' && getSiguienteEstado(task.estados!.id) as siguiente"
                   class="container-date"

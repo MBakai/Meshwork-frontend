@@ -1,0 +1,76 @@
+<!-- Overlay para cerrar al hacer click fuera -->
+<div class="panel-overlay" (click)="cerrar.emit()"></div>
+
+<div class="panel-subtareas" (click)="$event.stopPropagation()">
+  <div class="panel-header">
+    <h4>
+      <i class="fa-solid fa-file-invoice"></i>
+      Subtareas Asignadas
+    </h4>
+    <button (click)="cerrar.emit()" title="Cerrar">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <!-- Estado de carga -->
+  <div *ngIf="cargando" class="subtask-loading">
+    <div class="loading-spinner"></div>
+    Cargando subtareas...
+  </div>
+
+  <!-- Lista de subtareas -->
+  <ul *ngIf="!cargando && subtasks.length > 0" class="subtask-lista">
+    <li *ngFor="let subtask of subtasks" 
+        class="subtask-item"
+        (click)="verDetalleSubtarea(subtask)">
+      
+      <div class="subtask-contenido">
+
+        <div class="task-info">
+          <i class="fa-solid fa-folder"></i>
+          <strong>Titulo tarea principal:</strong> {{ subtask.tasktitulo }}
+        </div>
+
+        <div class="task-author">
+          <i class="fa-solid fa-user"></i>
+          <strong>Creado por:</strong> {{ subtask.creadornombre }}
+        </div>
+
+        <div class="subtask-titulo">
+          <i class="fa-solid fa-clipboard-check"></i>
+          <strong>Titulo subtarea:</strong>{{ subtask.subtasktitulo }}
+        </div>
+
+        <div class="subtask-titulo">
+          <i class="fa-solid fa-clipboard-check"></i>
+          <strong>Descripció subtarea:</strong>{{ subtask.subtaskdescripcion }}
+        </div>
+        
+        <div class="subtask-asignada">
+          <i class="fa-solid fa-user-check"></i>
+          Asignada a ti
+        </div>
+        
+        <a (click)="viewTaskDetail(subtask.subtaskid, $event)" 
+           class="view-more-link" 
+           role="button"
+           tabindex="0">
+          <i class="fa-solid fa-external-link-alt"></i>
+          Ver tarea completa
+        </a>
+      </div>
+    </li>
+  </ul>
+
+  <!-- Estado vacío -->
+  <div *ngIf="!cargando && subtasks.length === 0" class="subtask-vacia">
+    <i class="fa-solid fa-clipboard-list"></i>
+    <p>No tienes subtareas asignadas</p>
+  </div>
+
+  <!-- Contador de subtareas -->
+  <div *ngIf="!cargando && subtasks.length > 0" class="subtask-contador">
+    <i class="fa-solid fa-list-check"></i>
+    {{ subtasks.length }} subtarea{{ subtasks.length !== 1 ? 's' : '' }} asignada{{ subtasks.length !== 1 ? 's' : '' }}
+  </div>
+</div>

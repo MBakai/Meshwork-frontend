@@ -30,7 +30,6 @@ export class LoginComponent {
   
   constructor(
     private fb: FormBuilder, 
-    private routerUser: Router,
     private authService: AuthService,
   ) 
   {
@@ -82,7 +81,7 @@ export class LoginComponent {
         setTimeout(() => {
           this.router.navigate(['/dashboard'], { replaceUrl: true });
         }, 1600); // Espera que el Swal se cierre
-      },
+      }, 
       error: (err) => {
         const mensaje = err.error?.message || 'Error inesperado';
         const code = err.error?.Code;

@@ -1,5 +1,5 @@
-import { User } from "../../../../shared/interface/user.interface";
-import { Task } from "../../task/interface/task.interface";
+
+import { Task } from "../../task-service/interfaces/task.interface";
 
 export interface Subtask {
   id: string;
@@ -8,10 +8,9 @@ export interface Subtask {
   estados?: {
     id: number;
     nombre: string;
-  };        
-  task?: Task;               
+  };                      
   asignados: {
-    id: string;
+    id?: string;
     nombre: string;
   }[];
   startDate: string | null;   
@@ -19,4 +18,5 @@ export interface Subtask {
   createdAt: string;
   updatedAt: string;
   completedAt: string | null;
+  diasRestantesTexto?: string
 }

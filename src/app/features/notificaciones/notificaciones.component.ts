@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
-import { Notificaciones } from './interfaces/notificaciones.interface';
+import { Notificaciones } from '../../core/notificaciones/interfaces/notificaciones.interface';
 import { NotificacionesService } from '../../core/notificaciones/notificaciones.service';
 import { ColaboradorService } from '../../core/colaborador-service/colaborador.service';
 

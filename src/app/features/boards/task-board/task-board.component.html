@@ -4,33 +4,33 @@
             <!-- Título editable -->
             <div class="titulo-container">
                 <h1 *ngIf="!editandoTitulo" class="titulo-display" (click)="editarTitulo()">
-                {{ tareaForm.value.titulo }}
-                <span class="edit-icon">✏️</span>
+                    {{ tareaForm.value.titulo }}
+                    <span class="edit-icon">✏️</span>
                 </h1>
 
                 <div *ngIf="editandoTitulo" class="titulo-edit">
-                <input 
-                    type="text" 
-                    formControlName="titulo"
-                    class="titulo-input"
-                    maxlength="50"
-                    (keyup.enter)="guardarTitulo()"
-                    (keyup.escape)="cancelarEdicionTitulo()"
-                >
-                <div class="edit-buttons">
-                    <button class="btn-guardar"(click)="guardarTitulo()"
-                    [disabled]=" tareaForm.invalid || 
-                        !tareaForm.dirty">✓</button>
-                    <button class="btn-cancelar" (click)="cancelarEdicionTitulo()">✕</button>
-                </div>
+                    <input 
+                        type="text" 
+                        formControlName="titulo"
+                        class="titulo-input"
+                        maxlength="50"
+                        (keyup.enter)="guardarTitulo()"
+                        (keyup.escape)="cancelarEdicionTitulo()"
+                    >
+                    <div class="edit-buttons">
+                        <button class="btn-guardar"(click)="guardarTitulo()"
+                        [disabled]=" tareaForm.invalid || 
+                            !tareaForm.dirty">✓</button>
+                        <button class="btn-cancelar" (click)="cancelarEdicionTitulo()">✕</button>
+                    </div>
                 </div>
             </div>
 
             <!-- Descripción editable -->
             <div class="descripcion-container">
                 <p *ngIf="!editandoDescripcion" class="descripcion-display" (click)="editarDescripcion()">
-                {{ tareaForm.value.descripcion }}
-                <span class="edit-icon">✏️</span>
+                    {{ tareaForm.value.descripcion }}
+                    <span class="edit-icon">✏️</span>
                 </p>
 
                 <div *ngIf="editandoDescripcion" class="descripcion-edit">
@@ -181,7 +181,7 @@
                                 </div>
 
                                 <strong *ngIf="subTaks.endDate">
-                                    {{ getDiasParaTarea(subTaks) }}
+                                    {{ subTaks.diasRestantesTexto }}
                                 </strong>
 
                                 <div class="acciones">
@@ -206,7 +206,7 @@
                                         {{ usuario.nombre }}
                                         <button 
                                         class="btn-remover" 
-                                        (click)="removerColaborador(subTaks, usuario.id)"
+                                        (click)="removerColaborador(subTaks, usuario.id!)"
                                         title="Remover usuario">
                                         ×
                                         </button>

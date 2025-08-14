@@ -1,17 +1,21 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../core/auth-service/auth.service';
 import { TaskComponent } from '../boards/task/task.component';
 import { SubtaskComponent } from '../boards/subtask/subtask.component';
 import { ColaboradorService } from '../../core/colaborador-service/colaborador.service';
-import { ColaboradorResponse } from '../../shared/interface/colaborador-response.interface';
+import { ColaboradorResponse } from '../../core/auth-service/interface/colaborador-response.interface';
 import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
 import { NotificacionesService } from '../../core/notificaciones/notificaciones.service';
 import { NotificacionesComponent } from '../notificaciones/notificaciones.component';
 import Swal from 'sweetalert2';
-import { Notificaciones } from '../notificaciones/interfaces/notificaciones.interface';
+import { Notificaciones } from '../../core/notificaciones/interfaces/notificaciones.interface';
+import { SubtaskAsignComponent } from '../boards/subtask-asign/subtask-asign.component';
+import { subtaskResponse } from '../../core/subTask-service/interfaces/subtask-response.interface';
+import { SubtaskService } from '../../core/subTask-service/subtask.service';
+import { showUserSuccess } from '../../shared/utils/message-alerts.ts/message-alert-taskBoard';
 
 const Toast = Swal.mixin({
     toast: true,
@@ -33,9 +37,11 @@ const Toast = Swal.mixin({
     CommonModule,
     RouterOutlet,
     RouterModule,
+    ReactiveFormsModule,
     TaskComponent,
     SubtaskComponent,
-    NotificacionesComponent
+    NotificacionesComponent,
+    SubtaskAsignComponent
 ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
@@ -48,8 +54,13 @@ export class DashboardComponent {
   idTareaPadre: string | null = null;
   userName: string = '';
   userId: string = '';
+
+  formNombre!: FormGroup;
+  nombreOriginal: string = '';
+  editandoNombre = false;
   
-  @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('searchInput') searchInputRef!: ElementRef;
+  busquedaCorreoControl = new FormControl('');
   busquedaCorreo: string = '';
   usuariosEncontrados: ColaboradorResponse[] = [];
   
@@ -61,15 +72,21 @@ export class DashboardComponent {
   mostrarResultados = false;
   cargandoUsuarios: boolean = false;
 
-
   private searchSubject = new Subject<string>();
   private hideTimeout: any;
+
+  // Estado del panel de subtareas
+  isSubtaskMenuOpen: boolean = false;
+  subtaskCount: number = 0;
+  subtasks: subtaskResponse[] = [];
   
   constructor(
     private authService: AuthService,
     private colacoradorService: ColaboradorService,
      private notificacionesService: NotificacionesService,
+     private subtaskService: SubtaskService,
      private router: Router,
+     private fb: FormBuilder
   ){
     this.searchSubject.pipe(
       debounceTime(300), 
@@ -108,13 +125,57 @@ export class DashboardComponent {
 
       this.notificacionesService.obtenerNoLeidas().subscribe({
         next: ({ noLeidas }) => {
-          
           this.notiNoLeidas = noLeidas;
-          console.log('entre', this.notiNoLeidas)
         }
       });
+      this.cargarSubtareas();
     }
+    this.busquedaCorreoControl.valueChanges.subscribe(valor => {
+        this.busquedaCorreo = valor!.trim(); // si aún la necesitas por compatibilidad
+      
+      this.buscarUsuarios();
+    });
+
+    this.formNombre = this.fb.group({
+        nombre: [ Validators.required],
+    });
   }
+
+  editarNombre() {
+    Swal.fire({
+      title: 'Editar nombre',
+      input: 'text',
+      inputLabel: 'Nuevo nombre',
+      inputValue: this.userName,
+      showCancelButton: true,
+      confirmButtonText: 'Guardar',
+      cancelButtonText: 'Cancelar',
+      inputValidator: (value) => {
+        if (!value.trim()) {
+          return 'El nombre no puede estar vacío';
+        }
+        return null;
+      }
+    }).then((result) => {
+      if (result.isConfirmed && result.value) {
+        // Aquí llamas a tu servicio para actualizar
+        this.authService.updateUser(this.userId, { nombre: result.value }).subscribe({
+          next: (updatedUser) => {
+            this.userName = result.value;
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            currentUser.name = updatedUser.nombre;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+            Swal.fire('Éxito', 'Nombre actualizado correctamente', 'success');
+          },
+          error: () => {
+            Swal.fire('Error', 'No se pudo actualizar el nombre', 'error');
+          }
+        });
+      }
+    });
+  }
+
 
   logout() {
     let timerInterval: ReturnType<typeof setInterval>;;
@@ -151,20 +212,16 @@ export class DashboardComponent {
 
   conectarSocket() {
     if (!this.userId) {
-      console.error('No hay userId para conectar el socket');
       return;
     }
     
     this.notificacionesService.conectar(this.userId);
 
-    console.log(this.userId);
-    
     this.notificacionesService.escucharNotificaciones().subscribe({
       next: (noti) => {
 
         this.notificaciones.unshift(noti); 
         this.notiNoLeidas++;  
-        console.log('Nueva notificación:', noti);
       },
       error: (err) => {
         console.error('Error al escuchar notificaciones:', err);
@@ -187,7 +244,6 @@ export class DashboardComponent {
   
   marcarNotificacionesLeidas() {
     this.notiNoLeidas = 0;
-    console.log('Todas las notificaciones marcadas como leídas');
   }
 
   cargarNotificaciones() {
@@ -198,7 +254,6 @@ export class DashboardComponent {
         next: (notis) => {
           this.notificaciones = notis;
           this.notiNoLeidas = notis.filter(n => !n.leida).length;
-          console.log(this.notificaciones, this.notiNoLeidas);
           
         },
         error: (err) => {
@@ -239,15 +294,24 @@ export class DashboardComponent {
   }
 
   seleccionarUsuario(usuario: ColaboradorResponse) {
-    console.log('Usuario seleccionado:', usuario);
     
     this.busquedaCorreo = `${usuario.nombre} (${usuario.email})`;
     
     this.mostrarResultados = false;
     this.usuariosEncontrados = [];
   
-    if (this.searchInput) {
-      this.searchInput.nativeElement.blur();
+    if (this.searchInputRef) {
+      this.searchInputRef.nativeElement.blur();
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: MouseEvent) {
+    const clickedInside = this.searchInputRef?.nativeElement.contains(event.target);
+    if (!clickedInside) {
+      this.ocultarConRetardo();
+    } else {
+      this.mostrarResultados = true;
     }
   }
 
@@ -303,11 +367,9 @@ export class DashboardComponent {
 
   enviarSolicitud(usuario: ColaboradorResponse, event: Event) {
     event.stopPropagation(); 
-    console.log(usuario);
     
     this.colacoradorService.enviarSolicitud(usuario.id).subscribe({
       next: (response) => {
-        console.log('Solicitud enviada exitosamente:', response);
 
         // Actualizar estado localmente
         usuario.estadoSolicitud = 'pendiente';
@@ -344,6 +406,37 @@ export class DashboardComponent {
 
   createTask(){
     this.viewCreateTask = true;
+  }
+
+   /**
+   * Alternar la visibilidad del menú de subtareas
+   */
+  toggleSubtaskMenu() {
+    this.isSubtaskMenuOpen = !this.isSubtaskMenuOpen;
+    this.cargarSubtareas();
+  }
+
+  /**
+   * Cerrar el menú de subtareas
+   */
+  closeSubtaskMenu() {
+    this.isSubtaskMenuOpen = false;
+  }
+
+  
+    // Cargar subtareas asignadas
+   
+  private cargarSubtareas() {
+    this.subtaskService.getSubtaskColaborador().subscribe({
+      next: (subtasks) => {
+        
+        this.subtasks = subtasks;
+        this.subtaskCount = subtasks.length;
+      },
+      error: (error) => {
+        console.error('Error al cargar subtareas:', error);
+      }
+    });
   }
 
   abrirSubtarea(taskId: string) {

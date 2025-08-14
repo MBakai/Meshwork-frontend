@@ -1,13 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { TaskService } from '../../../core/task-service/task.service';
-import { Task } from '../task/interface/task.interface';
+import { Task } from '../../../core/task-service/interfaces/task.interface';
 import { CommonModule } from '@angular/common';
 import { FirstTaskComponent } from '../first-task/first-task.component';
 import { TaskEventService } from '../../../core/eventos-service/task-event.service';
-import { Subject, takeUntil } from 'rxjs';
+import { debounceTime, Subject, takeUntil } from 'rxjs';
 import Swal from 'sweetalert2';
 import { calcularDiasRestantes } from '../../../shared/utils/dias-restantes.utils';
-import { Estado } from '../../../shared/interface/estados.interface';
+import { Estado } from '../../../core/auth-service/interface/estados.interface';
 import { TaskComponent } from '../task/task.component';
 import { SubtaskComponent } from '../subtask/subtask.component';
 import { Router } from '@angular/router';
@@ -26,10 +26,13 @@ export class BoardComponent {
   cargandoTareas = false;
   isEditMode = false;
   numeroTareas = 0;
+
   viewUpdateTask = false;
-  idTareaParaEditar: string | null = null;
   viewSubTaskForm = false;
+
+  idTareaParaEditar: string | null = null;
   idSubTaskPadreEditar: string | null = null;
+
   private readonly router = inject(Router); 
 
   private destroy$ = new Subject<void>();
@@ -37,21 +40,24 @@ export class BoardComponent {
   constructor(
     private taskService: TaskService,
     private taskEventService: TaskEventService,
-  ) {}
+    ){}
 
   ngOnInit(): void {
-    
+    this.cargandoTareas = true;
     this.cargarTareas();
     
     this.taskService.getStatus().subscribe(data => {
-      console.log('estado cargado');
       this.estados = data;
     });
 
     this.taskEventService.taskCreated$
-    .pipe(takeUntil(this.destroy$))
+    .pipe(
+      debounceTime(300), // Espera 300ms después del último evento
+      takeUntil(this.destroy$)
+    )
     .subscribe(() => {
       this.cargarTareas();
+      
     });
 
   this.taskEventService.subTaskCreate$
@@ -82,7 +88,7 @@ export class BoardComponent {
   }
 
   cargarTareas() {
-
+    this.cargandoTareas = true;
     this.taskService.getTaskSimple().subscribe({
       next: (data: Task[]) => {
         this.numeroTareas = data.length;
@@ -95,6 +101,7 @@ export class BoardComponent {
       },
       error: (err) => {
         console.error('Error al recargar tareas:', err);
+        this.cargandoTareas = true;
       }
     });
   }
@@ -102,7 +109,7 @@ export class BoardComponent {
   deleteTask(id: string): void {
     Swal.fire({
       title: '¿Estás seguro?',
-      text: 'Esta acción eliminará la tarea permanentemente.',
+      text: 'Esta acción eliminará la tarea, subtareas y colaboradores asociadas a ellas de manera permanentemente.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
@@ -131,7 +138,8 @@ export class BoardComponent {
 
   editsubTask(taskId: string){
     this.idSubTaskPadreEditar = taskId;
-    this.viewUpdateTask = false; // ocultamos la modal actual
+    
+    this.viewUpdateTask = false;
     this.viewSubTaskForm = true;
   }
 
@@ -139,6 +147,11 @@ export class BoardComponent {
     this.router.navigate(['/dashboard/task-detalis', taskId]);
   }
   
+  formOpenSubtask(taskId: string) {
+    console.log(taskId); 
+          this.idSubTaskPadreEditar = taskId;
+          this.viewSubTaskForm = true;
+  }
 
   cerrarModal() {
     this.viewUpdateTask = false;

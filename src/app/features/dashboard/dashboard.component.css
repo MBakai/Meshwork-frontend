@@ -7,8 +7,30 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f8f9fa;
-    
 }
+
+.hamburger-btn {
+  display: none;
+}
+
+.container-nav {
+    display: flex;
+    flex-direction: column; /* Por defecto, apilamos en vertical */
+    align-items: stretch;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 15px 30px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    gap: 20px;
+}
+
+.cont-main {
+    display: flex;
+    justify-content: space-between; /* Título izquierda, nombre derecha */
+    align-items: center;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
 
 .enlace {
   cursor: pointer;
@@ -16,17 +38,6 @@ body {
   text-decoration: none;
 }
 /* Navbar Principal */
-.container-nav {
-    display: flex;
-    flex-flow: row wrap;
-    align-content: center;
-    justify-content: space-between;
-    align-items: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 15px 30px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    
-}
 
 .container-nav h1 {
     color: white;
@@ -38,7 +49,7 @@ body {
 
 .content-ul {
     list-style: none;
-    display: flex;
+    display: grid;
     align-items: center;
     gap: 25px;
     margin: 0;
@@ -50,7 +61,6 @@ body {
     align-items: center;
 }
 
-/* AGREGAR ESTAS REGLAS A TU CSS EXISTENTE */
 
 /* Contenedor de búsqueda - IMPORTANTE: position relative */
 .search-container {
@@ -321,19 +331,6 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-/* NAVBAR - Asegurar que no interfiera */
-.container-nav {
-    position: relative; /* Asegurar contexto de posicionamiento */
-    z-index: 1000; /* Menor que el dropdown */
-    display: flex;
-    flex-flow: row wrap;
-    align-content: center;
-    justify-content: space-between;
-    align-items: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 15px 30px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-}
 
 /* Responsive Updates */
 @media (max-width: 1024px) {
@@ -346,7 +343,8 @@ body {
     }
 }
 
-@media (max-width: 768px) {
+/* @media (max-width: 771px) {
+
     .container-nav {
         padding: 12px 20px;
         flex-direction: column;
@@ -367,55 +365,14 @@ body {
         order: -1;
     }
     
-    /* Dropdown responsive */
+    /* Dropdown responsive *
     .dropdown-result {
         max-height: 200px;
     }
-}
+} 
+*/
 
-@media (max-width: 580px) {
-    .search-modern {
-        max-width: 280px;
-    }
 
-    .search-modern input {
-        padding: 10px 15px 10px 40px;
-        font-size: 14px;
-    }
-
-    .search-modern i {
-        left: 14px;
-        font-size: 14px;
-    }
-}
-
-@media (max-width: 480px) {
-    .content-ul {
-        flex-direction: column;
-    }
-
-    .search-modern {
-        width: 100%;
-        max-width: 100%;
-        margin-bottom: 10px;
-    }
-    
-    /* Dropdown en móvil */
-    .dropdown-result {
-        max-height: 180px;
-    }
-    
-    .dropdown-result li {
-        padding: 10px 12px;
-        font-size: 13px;
-    }
-    
-    .usuario-avatar {
-        width: 28px;
-        height: 28px;
-        font-size: 11px;
-    }
-}
 
 /* Usuario info styling */
 .usuario-info {
@@ -500,28 +457,46 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .search-modern {
-        width: 100%;
-        max-width: 350px;
-    }
-    
-    .dropdown-result {
-        max-height: 200px;
-    }
-}
+
 
 /* Usuario */
-.user-name {
+.estyle-center {
+    display: flex;
+    flex-direction: row; /* Cambiar a dirección vertical */
+    align-items: center; /* Centrar horizontalmente */
+    gap: 10px;
     color: white;
     font-size: 16px;
     font-weight: 500;
     text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-    padding: 13px 16px;
+    padding: 15px 25px; /* Aumentar padding vertical para mejor espaciado */
     background: rgba(255,255,255,0.1);
     border-radius: 20px;
     backdrop-filter: blur(10px);
+}
+
+.btn-edit-name {
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.2);
+    color: white;
+    width: 25px;
+    height: 25px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Opcional: Efecto hover para el botón */
+.btn-edit-name:hover {
+    background: rgba(255,255,255,0.25);
+    border-color: rgba(255,255,255,0.3);
+    transform: translateY(-2px);
 }
 
 /* Botones del Nav */
@@ -565,16 +540,16 @@ body {
 }
 
 .noti-badge {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  background: red;
-  color: white;
-  border-radius: 50%;
-  padding: 3px 6px;
-  font-size: 10px;
-  font-weight: bold;
-  z-index: 10;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: red;
+    color: white;
+    border-radius: 50%;
+    padding: 3px 6px;
+    font-size: 10px;
+    font-weight: bold;
+    z-index: 10;
 }
 
 .btn-add:hover {
@@ -586,156 +561,70 @@ body {
     background: rgba(220, 53, 69, 0.2);
     border-color: rgba(220, 53, 69, 0.4);
 }
+.buttons-row {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+  }
 
-/* Layout Responsive */
-@media (max-width: 1024px) {
-    .search-modern {
-        width: 280px;
-    }
-    
-    .content-ul {
-        gap: 20px;
-    }
-}
-
-@media (max-width: 768px) {
+/* Layout para pantallas grandes */
+@media (min-width: 1291px) {
     .container-nav {
-        padding: 12px 20px;
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .container-nav h1 {
-        font-size: 24px;
-        text-align: center;
-    }
-
-    .content-ul {
         flex-direction: row;
-        flex-wrap: wrap;
-        gap: 15px;
-        justify-content: center;
-        width: 100%;
-    }
-
-    .search-modern {
-        width: 100%;
-        max-width: 320px;
-        order: -1; /* Pone el search primero */
-    }
-
-    .user-name {
-        font-size: 14px;
-        padding: 6px 12px;
-    }
-
-    .btn-nav {
-        width: 42px;
-        height: 42px;
-    }
-
-    .btn-nav i {
-        font-size: 16px;
-    }
-}
-
-@media (max-width: 580px) {
-    .container-nav {
-        padding: 10px 15px;
-    }
-
-    .container-nav h1 {
-        font-size: 22px;
-    }
-
-    .content-ul {
-        gap: 12px;
-    }
-
-    .search-modern {
-        max-width: 280px;
-    }
-
-    .search-modern input {
-        padding: 10px 15px 10px 40px;
-        font-size: 14px;
-    }
-
-    .search-modern i {
-        left: 14px;
-        font-size: 14px;
-    }
-
-    .user-name {
-        font-size: 13px;
-        padding: 5px 10px;
-    }
-
-    .btn-nav {
-        width: 38px;
-        height: 38px;
-    }
-
-    .btn-nav i {
-        font-size: 15px;
-    }
-}
-
-@media (max-width: 480px) {
-    .container-nav {
-        padding: 8px 12px;
-    }
-
-    .container-nav h1 {
-        font-size: 20px;
-    }
-
-    .content-ul {
-        gap: 10px;
-        flex-direction: column;
-    }
-
-    .search-modern {
-        width: 100%;
-        max-width: 100%;
-        margin-bottom: 10px;
-    }
-
-    /* Grupo de botones en fila */
-    .buttons-group {
-        display: flex;
-        gap: 10px;
         align-items: center;
-        justify-content: center;
+        justify-content: space-between;
+    }
+
+    .cont-main {
+        margin-bottom: 0;
+        flex: 1;
+        gap: 50px;
+    }
+
+    .content-ul {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+}
+
+/* Layout para <=1290px */
+@media (max-width: 1290px) {
+    .content-ul {
+        display: flex;
         flex-wrap: wrap;
-    }
-
-    .user-name {
-        font-size: 12px;
-        padding: 4px 8px;
-        margin-bottom: 5px;
-    }
-
-    .btn-nav {
-        width: 36px;
-        height: 36px;
-    }
-
-    .btn-nav i {
-        font-size: 14px;
+        gap: 10px;
+        justify-content: center;
     }
 }
 
-/* Contenido de ejemplo */
-.main-content {
-    padding: 40px 30px;
+@media (max-width: 625px) {
+  .content-ul {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  /* Barra de búsqueda arriba */
+  .search-container {
+    order: 1;
+  }
+
+  /* Botones agrupados abajo */
+  .btn-notification,
+  .btn-add,
+  .task-menu-container,
+  .buttons-group {
+    order: 2;
+  }
+
+  /* Alinearlos en fila abajo */
+  .buttons-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+  }
 }
 
-.demo-card {
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    max-width: 800px;
-    margin: 0 auto;
-}
+

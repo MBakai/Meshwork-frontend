@@ -2,7 +2,7 @@ import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../../core/auth-service/auth.service';
 import { inject } from '@angular/core';
 import { jwtDecode } from 'jwt-decode';
-import { JwtPayload } from '../interface/JwtPayload.interface';
+import { JwtPayload } from '../../core/auth-service/interface/JwtPayload.interface';
 import { of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
@@ -13,7 +13,6 @@ export const authGuard: CanActivateFn = () => {
   const token = authService.getAccessToken();
 
   if (token && !isTokenExpired(token)) {
-    console.log('Token válido, acceso permitido');
     return true;
   }
 
@@ -21,7 +20,6 @@ export const authGuard: CanActivateFn = () => {
   return authService.refreshToken().pipe(
     map((newToken: string) => {
       authService.saveAccessToken(newToken);
-      console.log('Token refrescado correctamente');
       return true;
     }),
     catchError((err) => {

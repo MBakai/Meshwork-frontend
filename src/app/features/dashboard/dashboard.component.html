@@ -1,15 +1,25 @@
 <nav class="container-nav">
-        <h1><a [routerLink]="['boards']" class="enlace">Meshwork</a></h1>
+
+    <div class="cont-main">
+        <h1 class="estyle-center">
+            <a [routerLink]="['boards']" class="enlace">Meshwork</a>
+        </h1>
+        <h3 class="estyle-center">
+            {{ userName }}
+            <button class="btn-edit-name" (click)="editarNombre()">
+                <i class="fa-solid fa-user-pen"></i>
+            </button>
+        </h3>
+    </div>
+
         <ul class="content-ul">
+
             <li class="search-container">
                 <div class="search-modern">
                     <input
                         type="text"
                         placeholder="Buscar por correo..."
-                        [(ngModel)]="busquedaCorreo"
-                        (input)="buscarUsuarios()"
-                        (focus)="mostrarResultados = true"
-                        (blur)="ocultarConRetardo()"
+                        [formControl]="busquedaCorreoControl"
                         #searchInput
                     />
                     <i class="fa-solid fa-magnifying-glass"></i>
@@ -54,27 +64,50 @@
                     </li>
                 </ul>
             </li>
-
-            <li>
-                <span class="user-name">{{userName}}</span>
-            </li>
-
-            <button class="btn-nav btn-notification" (click)="toggleNotificaciones()" title="Notificaciones">
-                <i class="fa-regular fa-bell"></i>
-                <span *ngIf="notiNoLeidas > 0" class="noti-badge">{{ notiNoLeidas }}</span>
-            </button>
-
-            <li>
-                <button class="btn-nav btn-add" (click)="createTask()" title="Crear tarea">
-                    <i class="fa-solid fa-plus"></i>
+            <div class="buttons-row">
+                <button class="btn-nav btn-notification" (click)="toggleNotificaciones()" title="Notificaciones">
+                    <i class="fa-regular fa-bell"></i>
+                    <span *ngIf="notiNoLeidas > 0" class="noti-badge">{{ notiNoLeidas }}</span>
                 </button>
-            </li>
 
-            <li class="buttons-group">
-                <button class="btn-nav btn-logout" (click)="logout()" title="Cerrar sesión">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                </button>
-            </li>
+                <li>
+                    <button class="btn-nav btn-add" (click)="createTask()" title="Crear tarea">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                </li>
+                <div class="dashboard-container">
+                    <!-- Otros contenidos del dashboard -->
+    
+                    <nav class="dashboard-nav">
+                        <ul class="nav-list">
+                            <!-- Otros botones de navegación -->
+                            
+                            <li class="nav-item task-menu-container">
+                                <button 
+                                    class="btn-nav btn-add" 
+                                    (click)="toggleSubtaskMenu()" 
+                                    title="Ver subtareas asignadas">
+                                    <i class="fa-solid fa-file-invoice"></i>
+                                    <span class="noti-badge" *ngIf="subtaskCount > 0">{{subtaskCount}}</span>
+                                </button>
+                                
+                                <app-subtask-asign 
+                                    *ngIf="isSubtaskMenuOpen"
+                                    [isVisible]="isSubtaskMenuOpen"
+                                    [subtasks]="subtasks"
+                                    (cerrar)="closeSubtaskMenu()"
+                                    (closeMenu)="closeSubtaskMenu()">
+                                </app-subtask-asign>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+                <li class="buttons-group">
+                    <button class="btn-nav btn-logout" (click)="logout()" title="Cerrar sesión">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </button>
+                </li>
+            </div>
         </ul>
     </nav>
 

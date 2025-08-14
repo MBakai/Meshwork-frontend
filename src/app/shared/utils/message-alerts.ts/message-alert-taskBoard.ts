@@ -17,8 +17,24 @@ const successMessages: Record<TaskAction, string> = {
   'remove-collaborator': 'Colaborador desasignado correctamente',
   'task-completed': 'Tarea finalizada',
 };
+type UserAction =
+  | 'edit';
+
+  const successMessageUser: Record<UserAction, string> = {
+    edit: 'Nombre actualizado correctamente'
+  }
 
 export function showTaskSuccess(action: TaskAction) {
+  Swal.fire({
+    position: 'center',
+    icon: 'success',
+    title: successMessages[action],
+    showConfirmButton: false,
+    timer: 1000,
+  });
+}
+
+  export function showUserSuccess(action: UserAction) {
   Swal.fire({
     position: 'center',
     icon: 'success',

@@ -1,5 +1,5 @@
-import { User } from "../../../../shared/interface/user.interface";
-import { Subtask } from "../../subtask/interfaces/subtask.interface";
+
+import { Subtask } from "../../subTask-service/interfaces/subtask.interface";
 import { TaskType } from "./type.enum";
 
 
