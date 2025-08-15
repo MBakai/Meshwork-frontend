@@ -23,7 +23,7 @@ export class BoardComponent {
 
   tasks: Task[] = [];
   estados: Estado[] = [];
-  cargandoTareas = false;
+  cargandoTareas = true;
   isEditMode = false;
   numeroTareas = 0;
 
