@@ -160,8 +160,6 @@ export class RegistroComponent implements OnInit {
           this.success = true;
           this.loading = false;
 
-          console.log('Formulario válido:', this.registroForm.value);
-
           this.registeredEmail = this.registroForm.value.email;
           this.showVerificationModal = true;
           
