@@ -92,9 +92,10 @@ export class BoardComponent {
     this.taskService.getTaskSimple().subscribe({
       next: (data: Task[]) => {
         this.numeroTareas = data.length;
-        if(this.numeroTareas > 1){
-          this.cargandoTareas = true;
+        if(this.numeroTareas === 0){
+          this.cargandoTareas = false;
         }
+        this.cargandoTareas = true;
         this.tasks = data;
         this.currentIndex = 0;
         
