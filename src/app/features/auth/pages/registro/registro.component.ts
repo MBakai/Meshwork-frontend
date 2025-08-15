@@ -159,9 +159,9 @@ export class RegistroComponent implements OnInit {
         next:(response) => { 
           this.success = true;
           this.loading = false;
-
           this.registeredEmail = this.registroForm.value.email;
           this.showVerificationModal = true;
+          this.registroForm.reset();
           
         },
         error: (err) => {
