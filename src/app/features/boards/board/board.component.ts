@@ -94,10 +94,11 @@ export class BoardComponent {
         this.numeroTareas = data.length;
         if(this.numeroTareas === 0){
           this.cargandoTareas = false;
+        }else if(this.numeroTareas >= 1){
+          this.cargandoTareas = true;
+          this.tasks = data;
+          this.currentIndex = 0;
         }
-        this.cargandoTareas = true;
-        this.tasks = data;
-        this.currentIndex = 0;
         
       },
       error: (err) => {
