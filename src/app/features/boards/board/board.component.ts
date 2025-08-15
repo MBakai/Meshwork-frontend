@@ -88,7 +88,7 @@ export class BoardComponent {
   }
 
   cargarTareas() {
-    this.cargandoTareas = true;
+    this.cargandoTareas = false;
     this.taskService.getTaskSimple().subscribe({
       next: (data: Task[]) => {
         this.numeroTareas = data.length;
